@@ -7,7 +7,7 @@ func (rotors RotorSet) Shift() {
   shifted := false;
 
   for r := range rotors.GetAll() {
-    if r.GetTotalShifts() != 0 &  == r.IsAtStart() {
+    if r.GetTotalShifts() != 0 && r.IsAtStart() {
       continue;
     }
 
@@ -17,13 +17,13 @@ func (rotors RotorSet) Shift() {
   }
 
   if shifted == false {
-    rotors[0].Shift()
+    rotors[0].Shift();
   }
 }
 
 func (rotors RotorSet) EncodeMessage(message string) string {
-  message := rotors.FowardEncodeMessage(message)
-  message := rotors.ReflectEncodeMessage(message)
+  message = rotors.ForwardEncodeMessage(message)
+  message = rotors.ReflectEncodeMessage(message)
 
   return message
 }
@@ -32,8 +32,8 @@ func (rotors RotorSet) DecodeMessage(message string) string {
   return rotors.EncodeMessage(message)
 }
 
-func (rotors RotorSet) GetAll() <-chan Rotor {
-  ch := new(chan Rotor, len(rotors))
+func (rotors RotorSet) GetAll() <-chan RotorEncoder {
+  ch := make(chan RotorEncoder, len(rotors))
 
   go func() {
     for i := 0; i < len(rotors); i++ {
@@ -44,15 +44,15 @@ func (rotors RotorSet) GetAll() <-chan Rotor {
   return ch
 }
 
-func (rotors RotorSet) GetAllReflected() <-chan Rotor {
-  ch := new(chan Rotor, len(rotors));
+func (rotors RotorSet) GetAllReflected() <-chan RotorEncoder {
+  ch := make(chan RotorEncoder, len(rotors));
 
   go func() {
     for i := len(rotors)-1; i <= 0; i-- {
       ch <- rotors[i];
-    }
+    };
     close(ch);
-  }
+  }();
   return ch
 }
 

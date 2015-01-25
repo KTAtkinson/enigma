@@ -1,15 +1,17 @@
 package emulator
 
+import "fmt"
 
-type RotorEncoder interface{
+
+type RotorEncoder interface {
   EncodeMessage(string) string
 
-  GetInitialPosition rune
-  GetTotalShifts int
+  GetInitialPosition() rune
+  GetTotalShifts() int
 
-  IsAtStart bool
-  Reset
-  Shift
+  IsAtStart() bool
+  Reset()
+  Shift()
 }
 
 
@@ -20,9 +22,9 @@ type Rotor struct {
 }
 
 func (rotor Rotor) EncodeMessage(message string) string {
-  encoded = new string
+  encoded := "";
   for _, r := range message {
-    encoded += Key[r];
+    encoded += string(rotor.key[r]);
   }
 
   return encoded
@@ -51,20 +53,21 @@ func (rotor Rotor) Shift() {
   rotor.totalShifts += 1
 }
 
-func (rotor Rotor) IsAtStart() {
+func (rotor Rotor) IsAtStart() bool {
   return rotor.init == rotor.key['a']
 }
 
 
-func NewAlphabeticRotor(init rune) Rotor, err {
+func NewAlphabeticRotor(init rune) (Rotor, error) {
   if init == 'a' {
-    return nil, 'Rotor can\'t be inititialized with "a" as the initial rotor position.'
+    return Rotor{}, fmt.Errorf("Rotor can't be inititialized with 'a' as the initial rotor position.")
+  }
   key := Key{}
   for _, r := range EN {
     key[r] = r
   }
 
-  rotor := rotor{key:key, init: init};
+  rotor := Rotor{key: key, init: init};
   rotor.Reset();
   return rotor, nil
 }
