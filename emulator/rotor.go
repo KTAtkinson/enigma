@@ -1,7 +1,5 @@
 package emulator
 
-import "fmt"
-
 
 type RotorEncoder interface {
   EncodeMessage(string) string
@@ -42,10 +40,16 @@ func (rotor Rotor) GetTotalShifts() int {
   return rotor.totalShifts
 }
 
-func (rotor Rotor) Reset() {
-  for rotor.key['a'] != rotor.init {
-    rotor.key.Shift()
-  }
+func (rotor Rotor) Reset() error {
+  err := rotor.key.SetFirstValue(rotor.init);
+  rotor.totalShifts = 0;
+  return err
+}
+
+func (rotor Rotor) copy_() Rotor {
+  newRotor := Rotor{key: rotor.key.copy_(), init: rotor.init};
+  newRotor.Reset()
+  return newRotor
 }
 
 func (rotor Rotor) Shift() {
@@ -59,15 +63,16 @@ func (rotor Rotor) IsAtStart() bool {
 
 
 func NewAlphabeticRotor(init rune) (Rotor, error) {
-  if init == 'a' {
-    return Rotor{}, fmt.Errorf("Rotor can't be inititialized with 'a' as the initial rotor position.")
-  }
-  key := Key{}
+ key := Key{}
   for _, r := range EN {
     key[r] = r
   }
 
   rotor := Rotor{key: key, init: init};
-  rotor.Reset();
+  err := rotor.key.SetFirstValue(rotor.init);
+  if err != nil {
+    return rotor, err
+  }
+
   return rotor, nil
 }
